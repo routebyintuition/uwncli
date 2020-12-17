@@ -1,0 +1,5 @@
+09cd1fde3887cea0f9dd45c991497c30903b5bbdfc409747086d6a293cbe6813  uwncli_v0.0.0-next_Windows_i386.tar.gz
+100787c0b01fd31d94e9c778aa220ab25e62291ae5a4bf99aa5887b7ea869e8f  uwncli_v0.0.0-next_Linux_i386.tar.gz
+22fbf03a5e1d8f6df119296178718b01d0a6cc347a04bc6829c5fbd05a0d12ba  uwncli_v0.0.0-next_Windows_x86_64.tar.gz
+6be7c6dc6ce8ef77a93196313059f1092e8e474274b30a62ce5ddcafe9c606a0  uwncli_v0.0.0-next_Darwin_x86_64.tar.gz
+f9aa469e1028aaa4ca3c3e565b04c2e8e3c8a28404277757e9f66fe4db27c7d7  uwncli_v0.0.0-next_Linux_x86_64.tar.gz
