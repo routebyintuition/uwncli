@@ -8,6 +8,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	nutanix "github.com/routebyintuition/ntnx-go-sdk"
 	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v2/altsrc"
 )
 
 // NCLI is the baseline type to house SDK/connection config
@@ -21,75 +22,30 @@ func main() {
 	ncli := &NCLI{}
 	ncli.tr = tablewriter.NewWriter(os.Stdout)
 
+	flags := getFlags()
+
 	app := &cli.App{
 		Name:                 "Unikum Wunderbar Nutanix CLI",
-		Usage:                "Built for those who are Unikum Wunderbar",
+		Usage:                "Built for the Unikum und Wunderbar",
 		EnableBashCompletion: true,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "url",
-				Aliases:     []string{"w"},
-				Value:       "https://localhost:9440/api/nutanix/v3/",
-				Usage:       "Prism Central URL",
-				DefaultText: "https://localhost:9440/api/nutanix/v3/",
-				EnvVars:     []string{"NUTANIX_PC_URL"},
-			},
-			&cli.StringFlag{
-				Name:        "user",
-				Aliases:     []string{"u", "username"},
-				Value:       "{pc username}",
-				Usage:       "Prism Central Username",
-				DefaultText: "<username>",
-				EnvVars:     []string{"NUTANIX_PC_USER"},
-			},
-			&cli.StringFlag{
-				Name:        "pass",
-				Aliases:     []string{"p", "password"},
-				Value:       "{pc password}",
-				Usage:       "Prism Central Password",
-				DefaultText: "<password>",
-				EnvVars:     []string{"NUTANIX_PC_PASS"},
-			},
-			&cli.StringFlag{
-				Name:        "image-name",
-				Aliases:     []string{"iname", "in"},
-				Value:       "",
-				Usage:       "Image Name",
-				DefaultText: "<image name>",
-			},
-			&cli.StringFlag{
-				Name:        "image-description",
-				Aliases:     []string{"idesc", "id"},
-				Value:       "",
-				Usage:       "Image Description",
-				DefaultText: "<image description>",
-			},
-			&cli.StringFlag{
-				Name:        "image-source",
-				Aliases:     []string{"isrc", "is"},
-				Value:       "",
-				Usage:       "Image Source",
-				DefaultText: "<image source>",
-			},
-			&cli.StringFlag{
-				Name:        "image-type",
-				Aliases:     []string{"itype", "it"},
-				Value:       "",
-				Usage:       "Image Type - DISK_IMAGE or ISO_IMAGE",
-				DefaultText: "<image type>",
-			},
-			&cli.BoolFlag{
-				Name:    "skip-cert-verify",
-				Aliases: []string{"skipverify", "scv"},
-				Value:   false,
-				Usage:   "Image Source",
-			},
-		},
+		Before:               altsrc.InitInputSourceWithContext(flags, altsrc.NewYamlSourceFromFlagFunc("load-profile")),
+		Flags:                flags,
 		Commands: []*cli.Command{
+			{
+				Name:    "configure",
+				Aliases: []string{"conf"},
+				Usage:   "configure stored credentials",
+				Action:  saveCredentials,
+			},
+			{
+				Name:   "list-profiles",
+				Usage:  "list saved profiles",
+				Action: ncli.listProfiles,
+			},
 			{
 				Before: func(c *cli.Context) error {
 					var err error
-					ncli.con, err = setupConnection(c.Bool("skip-cert-verify"))
+					ncli.con, err = setupConnection(c)
 					return err
 				},
 				Name: "vm",
@@ -109,13 +65,18 @@ func main() {
 						Usage:  "get disk list of VM by UUID",
 						Action: ncli.vmDiskList,
 					},
+					{
+						Name:   "update-memory",
+						Usage:  "<UUID> <memory in MB integer>",
+						Action: ncli.vmMemoryUpdate,
+					},
 				},
 				Category: "vm",
 			},
 			{
 				Before: func(c *cli.Context) error {
 					var err error
-					ncli.con, err = setupConnection(c.Bool("skip-cert-verify"))
+					ncli.con, err = setupConnection(c)
 					return err
 				},
 				Name: "image",
@@ -136,7 +97,7 @@ func main() {
 			{
 				Before: func(c *cli.Context) error {
 					var err error
-					ncli.con, err = setupConnection(c.Bool("skip-cert-verify"))
+					ncli.con, err = setupConnection(c)
 					return err
 				},
 				Name: "cluster",

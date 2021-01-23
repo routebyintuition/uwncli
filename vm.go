@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/routebyintuition/ntnx-go-sdk/pc"
@@ -29,6 +31,37 @@ func (n *NCLI) vmList(c *cli.Context) error {
 	}
 	n.tr.AppendBulk(data)
 	n.tr.Render()
+
+	return nil
+}
+
+func (n *NCLI) vmMemoryUpdate(c *cli.Context) error {
+	if !IsValidUUID(c.Args().First()) {
+		return errors.New("invalid UUID format")
+	}
+
+	if len(c.Args().Get(1)) == 0 {
+		return errors.New("no memory value provided...should be an integer")
+	}
+
+	memVal, err := strconv.Atoi(c.Args().Get(1))
+	if err != nil {
+		return err
+	}
+	if memVal < 500 || memVal > 500000 {
+		return errors.New("invalid memory value")
+	}
+
+	fmt.Printf("updating VM %s with memory %d \n", c.Args().First(), memVal)
+
+	getRequest := &pc.VMGetRequest{UUID: c.Args().First()}
+	getRes, _, err := n.con.PC.VM.Get(getRequest)
+	if err != nil {
+		return err
+	}
+
+	tmoOutput, _ := json.Marshal(getRes)
+	fmt.Println(string(tmoOutput))
 
 	return nil
 }
