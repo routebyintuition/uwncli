@@ -20,14 +20,14 @@ func (n *NCLI) vmList(c *cli.Context) error {
 		return err
 	}
 
-	n.tr.SetHeader([]string{"Name", "UUID"})
+	n.tr.SetHeader([]string{"Name", "UUID", "Powered", "Cluster"})
 
-	n.tr.SetFooter([]string{"Total", strconv.Itoa(len(getRes.Entities))})
+	n.tr.SetFooter([]string{"Total", "", "", strconv.Itoa(len(getRes.Entities))})
 
 	data := [][]string{}
 
 	for _, entityValue := range getRes.Entities {
-		data = append(data, []string{*entityValue.Spec.Name, *entityValue.Metadata.UUID})
+		data = append(data, []string{*entityValue.Spec.Name, *entityValue.Metadata.UUID, *entityValue.Spec.Resources.PowerState, entityValue.Spec.ClusterReference.Name})
 	}
 	n.tr.AppendBulk(data)
 	n.tr.Render()
