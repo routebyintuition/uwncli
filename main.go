@@ -28,7 +28,7 @@ func main() {
 		Name:                 "Unikum Wunderbar Nutanix CLI",
 		Usage:                "Built for the Unikum und Wunderbar",
 		EnableBashCompletion: true,
-		Before:               altsrc.InitInputSourceWithContext(flags, altsrc.NewYamlSourceFromFlagFunc("load-profile")),
+		Before:               altsrc.InitInputSourceWithContext(flags, NewYamlSourceFromProfileFunc("profile")),
 		Flags:                flags,
 		Commands: []*cli.Command{
 			{

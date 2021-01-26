@@ -51,8 +51,6 @@ func (n *NCLI) vmMemoryUpdate(c *cli.Context) error {
 		return errors.New("invalid memory value")
 	}
 
-	// fmt.Printf("updating VM %s with memory %d \n", c.Args().First(), memVal)
-
 	getRequest := &pc.VMGetRequest{UUID: c.Args().First()}
 	getRes, _, err := n.con.PC.VM.Get(getRequest)
 	if err != nil {
@@ -68,7 +66,6 @@ func (n *NCLI) vmMemoryUpdate(c *cli.Context) error {
 	updateRequest.UUID = c.Args().First()
 	updateRequest.Data = *updateRequestData
 
-	// fmt.Println("memory: ", *updateRequest.Data.Spec.Resources.MemorySizeMib)
 	mibValue := GetMibFromMB(memVal)
 	updateRequest.Data.Spec.Resources.MemorySizeMib = &mibValue
 

@@ -29,13 +29,11 @@ func getFlags() []cli.Flag {
 			DefaultText: "10.0.0.1:9440",
 			EnvVars:     []string{"NUTANIX_PC_ADDRESS"},
 		}),
-		&cli.StringFlag{
-			Name:  "load-profile",
-			Usage: "<filename>",
-			// Value:       fileLocale,
-			// DefaultText: fileLocale,
-			EnvVars: []string{"NUTANIX_LOAD_PROFILE"},
-		},
+		// &cli.StringFlag{
+		// 	Name:    "profile",
+		// 	Usage:   "<profile name>",
+		//	EnvVars: []string{"NUTANIX_PROFILE"},
+		// },
 		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:    "username",
 			Aliases: []string{"u", "user"},
@@ -61,6 +59,7 @@ func getFlags() []cli.Flag {
 			Value:       "default",
 			Usage:       "stored credential profile to use",
 			DefaultText: "<default>",
+			EnvVars:     []string{"NUTANIX_PROFILE"},
 		},
 		&cli.StringFlag{
 			Name:        "image-name",

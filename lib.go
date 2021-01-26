@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	nutanix "github.com/routebyintuition/ntnx-go-sdk"
 	"github.com/routebyintuition/ntnx-go-sdk/pc"
 	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v2/altsrc"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -131,4 +133,27 @@ func GetConfigLocale(profile string) (string, string) {
 // GetMibFromMB returns the Mebibyte value from a provided Megabyte int
 func GetMibFromMB(mb int) int {
 	return int(math.Floor(float64(mb) * 0.95367431640625))
+}
+
+// defaultInputSource creates a default InputSourceContext.
+func defaultInputSource() (altsrc.InputSourceContext, error) {
+	return &altsrc.MapInputSource{}, nil
+}
+
+// NewYamlSourceFromProfileFunc creates a new Yaml InputSourceContext from a provided flag name and source context.
+func NewYamlSourceFromProfileFunc(flagProfileName string) func(context *cli.Context) (altsrc.InputSourceContext, error) {
+	return func(context *cli.Context) (altsrc.InputSourceContext, error) {
+		if context.IsSet(flagProfileName) {
+			profileName := context.String(flagProfileName)
+			_, profilePath := GetConfigLocale(profileName)
+			return altsrc.NewYamlSourceFromFile(profilePath)
+		}
+
+		_, profilePath := GetConfigLocale("default")
+		if _, err := os.Stat(profilePath); err == nil {
+			return altsrc.NewYamlSourceFromFile(profilePath)
+		}
+
+		return defaultInputSource()
+	}
 }
