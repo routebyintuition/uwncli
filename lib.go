@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"path/filepath"
 	"regexp"
@@ -125,4 +126,9 @@ func GetConfigLocale(profile string) (string, string) {
 	fileLocale := filepath.Join(home, ".nutanix", fileName)
 
 	return dirLocale, fileLocale
+}
+
+// GetMibFromMB returns the Mebibyte value from a provided Megabyte int
+func GetMibFromMB(mb int) int {
+	return int(math.Floor(float64(mb) * 0.95367431640625))
 }

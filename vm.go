@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -52,7 +51,7 @@ func (n *NCLI) vmMemoryUpdate(c *cli.Context) error {
 		return errors.New("invalid memory value")
 	}
 
-	fmt.Printf("updating VM %s with memory %d \n", c.Args().First(), memVal)
+	// fmt.Printf("updating VM %s with memory %d \n", c.Args().First(), memVal)
 
 	getRequest := &pc.VMGetRequest{UUID: c.Args().First()}
 	getRes, _, err := n.con.PC.VM.Get(getRequest)
@@ -60,8 +59,25 @@ func (n *NCLI) vmMemoryUpdate(c *cli.Context) error {
 		return err
 	}
 
-	tmoOutput, _ := json.Marshal(getRes)
-	fmt.Println(string(tmoOutput))
+	updateRequest := &pc.VMUpdateRequest{}
+	updateRequestData := &pc.VMUpdateRequestData{}
+	updateRequestData.Spec = getRes.Spec
+	updateRequestData.APIVersion = &getRes.APIVersion
+	updateRequestData.Metadata = &getRes.Metadata
+
+	updateRequest.UUID = c.Args().First()
+	updateRequest.Data = *updateRequestData
+
+	// fmt.Println("memory: ", *updateRequest.Data.Spec.Resources.MemorySizeMib)
+	mibValue := GetMibFromMB(memVal)
+	updateRequest.Data.Spec.Resources.MemorySizeMib = &mibValue
+
+	_, _, err = n.con.PC.VM.Update(updateRequest)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("vm updated to %d memory\n", memVal)
 
 	return nil
 }
