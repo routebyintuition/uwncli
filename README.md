@@ -56,7 +56,26 @@ Command line flags:
 uwncli --pcaddress "10.0.0.10:9440" --username <username> --password <password> vm list
 ```
 
+Skipping certificate verification can be useful for non-production environments or new deployments where a valid vertificate has not yet been configured. This can be done as in the example below:
+
+```sh
+./uwncli --skip-cert-verify vm list
+```
+
 ## Capabilities
+
+- configure
+- list-profiles
+- vm
+  - list
+  - get
+  - disklist
+  - update-memory
+- cluster
+  - list
+- image
+  - list
+  - create
 
 ## Examples
 
