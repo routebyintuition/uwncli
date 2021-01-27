@@ -25,7 +25,7 @@ func main() {
 	flags := getFlags()
 
 	app := &cli.App{
-		Name:                 "Unikum Wunderbar Nutanix CLI",
+		Name:                 "Unikum und Wunderbar Nutanix CLI",
 		Usage:                "Built for the Unikum und Wunderbar",
 		EnableBashCompletion: true,
 		Before:               altsrc.InitInputSourceWithContext(flags, NewYamlSourceFromProfileFunc("profile")),

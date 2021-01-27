@@ -35,16 +35,18 @@ func getFlags() []cli.Flag {
 		//	EnvVars: []string{"NUTANIX_PROFILE"},
 		// },
 		altsrc.NewStringFlag(&cli.StringFlag{
-			Name:    "username",
-			Aliases: []string{"u", "user"},
-			// Value:       "{pc username}",
+			Name:        "username",
+			Aliases:     []string{"u", "user"},
 			Usage:       "Prism Central Username",
 			DefaultText: "<username>",
 			EnvVars:     []string{"NUTANIX_PC_USER"},
 		}),
 		altsrc.NewStringFlag(&cli.StringFlag{
-			Name:    "password",
-			Aliases: []string{"p", "pass"},
+			Name:        "password",
+			Aliases:     []string{"p", "pass"},
+			Usage:       "Prism Central Passowrd",
+			DefaultText: "<password>",
+			EnvVars:     []string{"NUTANIX_PC_PASS"},
 		}),
 		&cli.StringFlag{
 			Name:        "config",
