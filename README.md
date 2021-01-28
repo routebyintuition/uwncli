@@ -65,7 +65,10 @@ Skipping certificate verification can be useful for non-production environments 
 ## Capabilities
 
 - configure
-- list-profiles
+- profile
+  - list
+  - delete
+  - create
 - vm
   - list
   - get

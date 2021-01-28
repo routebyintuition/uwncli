@@ -123,6 +123,16 @@ func defaultInputSource() (altsrc.InputSourceContext, error) {
 	return &altsrc.MapInputSource{}, nil
 }
 
+func sliceContains(sli []string, str string) bool {
+	for _, sliceItem := range sli {
+		if sliceItem == str {
+			return true
+		}
+	}
+
+	return false
+}
+
 // NewYamlSourceFromProfileFunc creates a new Yaml InputSourceContext from a provided flag name and source context.
 func NewYamlSourceFromProfileFunc(flagProfileName string) func(context *cli.Context) (altsrc.InputSourceContext, error) {
 	return func(context *cli.Context) (altsrc.InputSourceContext, error) {
