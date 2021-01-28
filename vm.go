@@ -12,20 +12,40 @@ import (
 func (n *NCLI) vmList(c *cli.Context) error {
 
 	ListRequest := new(pc.VMListRequest)
-	ListRequest.Length = 1000
+	ListRequest.Length = 40
 
-	getRes, _, err := n.con.PC.VM.List(ListRequest)
-	if err != nil {
-		return err
+	var vmListLoop []pc.Entities
+	totalMatches := 0
+	offset := 0
+	currentMatches := -1
+	var err error
+	var getRes *pc.VMListResponse
+
+	for totalMatches > currentMatches {
+		if currentMatches == -1 {
+			currentMatches = 0
+		}
+
+		ListRequest.Offset = offset
+
+		getRes, _, err = n.con.PC.VM.List(ListRequest)
+		if err != nil {
+			return err
+		}
+
+		currentMatches += *getRes.Metadata.Length
+		totalMatches = *getRes.Metadata.TotalMatches
+		offset += ListRequest.Length
+		vmListLoop = append(vmListLoop, getRes.Entities...)
 	}
 
 	n.tr.SetHeader([]string{"Name", "UUID", "Powered", "Cluster"})
 
-	n.tr.SetFooter([]string{"Total", "", "", strconv.Itoa(len(getRes.Entities))})
+	n.tr.SetFooter([]string{"Total", "", "", strconv.Itoa(*getRes.Metadata.TotalMatches)})
 
 	data := [][]string{}
 
-	for _, entityValue := range getRes.Entities {
+	for _, entityValue := range vmListLoop {
 		data = append(data, []string{*entityValue.Spec.Name, *entityValue.Metadata.UUID, *entityValue.Spec.Resources.PowerState, entityValue.Spec.ClusterReference.Name})
 	}
 	n.tr.AppendBulk(data)

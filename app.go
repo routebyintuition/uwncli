@@ -1,12 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
-	"strconv"
-	"strings"
-
-	"github.com/mitchellh/go-homedir"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
 )
@@ -99,38 +93,4 @@ func getFlags() []cli.Flag {
 		},
 	}
 	return output
-}
-
-func (n *NCLI) listProfiles(c *cli.Context) error {
-	home, err := homedir.Dir()
-	if err != nil {
-		return err
-	}
-
-	profileFolder := fmt.Sprintf("%s/.nutanix/", home)
-	profileFileList, err := ioutil.ReadDir(profileFolder)
-	if err != nil {
-		return err
-	}
-
-	n.tr.SetHeader([]string{"Profile", "Last Modified", "Location"})
-
-	data := [][]string{}
-	profileCount := 0
-
-	for _, profileFileItem := range profileFileList {
-		if !profileFileItem.IsDir() && strings.HasSuffix(profileFileItem.Name(), ".credential") {
-			profileCount++
-			data = append(data, []string{strings.TrimSuffix(profileFileItem.Name(), ".credential"), profileFileItem.ModTime().String(), fmt.Sprintf("%s%s", profileFolder, profileFileItem.Name())})
-			fmt.Println("profile: ", strings.TrimSuffix(profileFileItem.Name(), ".credential"))
-			fmt.Println("modified: ", profileFileItem.ModTime())
-		}
-	}
-
-	n.tr.SetFooter([]string{"Total", "", strconv.Itoa(profileCount)})
-	n.tr.SetAutoWrapText(false)
-	n.tr.AppendBulk(data)
-	n.tr.Render()
-
-	return nil
 }

@@ -70,23 +70,6 @@ func setupConnection(c *cli.Context) (*nutanix.Client, error) {
 	return con, err
 }
 
-func vmList(PC *pc.Client, vmName string, count int) {
-	ListRequest := new(pc.VMListRequest)
-	ListRequest.Length = count
-
-	getRes, _, err := PC.VM.List(ListRequest)
-	if err != nil {
-		fmt.Println("cluster list error: ", err)
-		return
-	}
-
-	fmt.Println("VM Count: ", len(getRes.Entities))
-	for index, entityValue := range getRes.Entities {
-		fmt.Printf("VM: %d - %s \n", index, *entityValue.Spec.Name)
-		fmt.Printf("\t UUID: %s \n", *entityValue.Metadata.UUID)
-	}
-}
-
 // IsValidUUID validates UUID string
 func IsValidUUID(uuid string) bool {
 	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")

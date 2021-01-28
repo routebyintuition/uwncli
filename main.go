@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -38,61 +37,30 @@ func main() {
 				Action:  saveCredentials,
 			},
 			{
-				Name:   "list-profiles",
-				Usage:  "list saved profiles",
-				Action: ncli.listProfiles,
-			},
-			{
 				Before: func(c *cli.Context) error {
 					var err error
 					ncli.con, err = setupConnection(c)
 					return err
 				},
-				Name: "vm",
+				Name:  "profile",
+				Usage: "stored profile specific commands. use `uwncli profile help` to view options",
 				Subcommands: []*cli.Command{
 					{
 						Name:   "list",
-						Usage:  "retrieve all VMs",
-						Action: ncli.vmList,
+						Usage:  "list all stored profiles",
+						Action: ncli.listProfiles,
 					},
 					{
-						Name:   "get",
-						Usage:  "get one VM by UUID",
-						Action: ncli.vmGet,
-					},
-					{
-						Name:   "disklist",
-						Usage:  "get disk list of VM by UUID",
-						Action: ncli.vmDiskList,
-					},
-					{
-						Name:   "update-memory",
-						Usage:  "<UUID> <memory in MB integer>",
-						Action: ncli.vmMemoryUpdate,
-					},
-				},
-				Category: "vm",
-			},
-			{
-				Before: func(c *cli.Context) error {
-					var err error
-					ncli.con, err = setupConnection(c)
-					return err
-				},
-				Name: "image",
-				Subcommands: []*cli.Command{
-					{
-						Name:   "list",
-						Usage:  "list all images",
-						Action: ncli.imageList,
+						Name:   "delete",
+						Usage:  "uwncli delete <profile name>",
+						Action: ncli.deleteProfile,
 					},
 					{
 						Name:   "create",
-						Usage:  "create a new image",
-						Action: ncli.imageCreate,
+						Usage:  "create a new profile",
+						Action: saveCredentials,
 					},
 				},
-				Category: "image",
 			},
 			{
 				Before: func(c *cli.Context) error {
@@ -100,20 +68,73 @@ func main() {
 					ncli.con, err = setupConnection(c)
 					return err
 				},
-				Name: "cluster",
+				Name:  "vm",
+				Usage: "virtual machine specific commands. use `uwncli vm help` to view options",
 				Subcommands: []*cli.Command{
 					{
-						Name:  "all",
-						Usage: "retrieve all VMs",
-						Action: func(c *cli.Context) error {
-							fmt.Println("new task template: ", c.Args().First())
-							fmt.Println("user: ", c.String("user"))
-							vmList(ncli.con.PC, c.String("vmname"), 10)
-							return nil
-						},
+						Name:     "list",
+						Usage:    "retrieve all VMs",
+						Action:   ncli.vmList,
+						Category: "get",
+					},
+					{
+						Name:     "get",
+						Usage:    "get one VM by UUID",
+						Action:   ncli.vmGet,
+						Category: "get",
+					},
+					{
+						Name:     "disklist",
+						Usage:    "get disk list of VM by UUID",
+						Action:   ncli.vmDiskList,
+						Category: "put",
+					},
+					{
+						Name:     "update-memory",
+						Usage:    "<UUID> <memory in MB integer>",
+						Action:   ncli.vmMemoryUpdate,
+						Category: "put",
 					},
 				},
-				Category: "cluster",
+			},
+			{
+				Before: func(c *cli.Context) error {
+					var err error
+					ncli.con, err = setupConnection(c)
+					return err
+				},
+				Name:  "image",
+				Usage: "image specific commands. use `uwncli image help` to view options",
+				Subcommands: []*cli.Command{
+					{
+						Name:     "list",
+						Usage:    "list all images",
+						Action:   ncli.imageList,
+						Category: "image",
+					},
+					{
+						Name:     "create",
+						Usage:    "create a new image",
+						Action:   ncli.imageCreate,
+						Category: "image",
+					},
+				},
+			},
+			{
+				Before: func(c *cli.Context) error {
+					var err error
+					ncli.con, err = setupConnection(c)
+					return err
+				},
+				Name:  "cluster",
+				Usage: "cluster specific commands. use `uwncli cluster help` to view options",
+				Subcommands: []*cli.Command{
+					{
+						Name:     "all",
+						Usage:    "retrieve all VMs",
+						Category: "cluster",
+					},
+				},
 			},
 		},
 	}
