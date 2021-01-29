@@ -8,26 +8,19 @@ import (
 func getFlags() []cli.Flag {
 	output := []cli.Flag{
 		altsrc.NewStringFlag(&cli.StringFlag{
-			Name:    "pcurl",
-			Aliases: []string{"purl"},
-			// Value:       "https://localhost:9440/api/nutanix/v3/",
+			Name:        "pcurl",
+			Aliases:     []string{"purl"},
 			Usage:       "Prism Central URL",
 			DefaultText: "https://10.0.0.1:9440/api/nutanix/v3/",
 			EnvVars:     []string{"NUTANIX_PC_URL"},
 		}),
 		altsrc.NewStringFlag(&cli.StringFlag{
-			Name:    "pcaddress",
-			Aliases: []string{"pca"},
-			// Value:       "10.0.0.1",
+			Name:        "pcaddress",
+			Aliases:     []string{"pca"},
 			Usage:       "Prism Central Address",
 			DefaultText: "10.0.0.1:9440",
 			EnvVars:     []string{"NUTANIX_PC_ADDRESS"},
 		}),
-		// &cli.StringFlag{
-		// 	Name:    "profile",
-		// 	Usage:   "<profile name>",
-		//	EnvVars: []string{"NUTANIX_PROFILE"},
-		// },
 		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "username",
 			Aliases:     []string{"u", "user"},
@@ -42,13 +35,6 @@ func getFlags() []cli.Flag {
 			DefaultText: "<password>",
 			EnvVars:     []string{"NUTANIX_PC_PASS"},
 		}),
-		&cli.StringFlag{
-			Name:        "config",
-			Aliases:     []string{"conf", "co"},
-			Value:       "~/.nutanix/credentials",
-			Usage:       "Credentials file location",
-			DefaultText: "<credentials file and path>",
-		},
 		&cli.StringFlag{
 			Name:        "profile",
 			Aliases:     []string{"pro"},

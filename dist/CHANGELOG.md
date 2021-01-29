@@ -2,7 +2,10 @@
 
 ## Changelog
 
-7d98dea added power state and cluster to vm list
-33ad127 profile storage
-43c0c5a vm update memory
+6fb92ee documentation updates
+2d3e699 improved metrics in vm get
+c44774a improved vmget and added power state update
+0bc4b03 profile use added
+00c448c readme updates
+cdd5618 updated profile options and docs
 
