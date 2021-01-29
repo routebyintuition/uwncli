@@ -117,10 +117,28 @@ func (n *NCLI) vmGet(c *cli.Context) error {
 	name := *getRes.Spec.Name
 
 	for _, diskItem := range *getRes.Status.Resources.DiskList {
-		data = append(data, []string{name, diskItem.UUID, strconv.Itoa(diskItem.DiskSizeBytes), diskItem.DeviceProperties.DiskAddress.AdapterType})
+		sizeKB := fmt.Sprintf("%.1f", float64(diskItem.DiskSizeBytes/1000))
+		sizeMB := fmt.Sprintf("%.1f", float64(diskItem.DiskSizeBytes/1000000))
+		sizeGB := fmt.Sprintf("%.1f", float64(diskItem.DiskSizeBytes/1000000000))
+
+		diskSizeStr := strconv.Itoa(diskItem.DiskSizeBytes)
+
+		if sizeKB != "0.0" {
+			diskSizeStr = fmt.Sprintf("%s KB", sizeKB)
+		}
+
+		if sizeMB != "0.0" {
+			diskSizeStr = fmt.Sprintf("%s KB", sizeMB)
+		}
+
+		if sizeGB != "0.0" {
+			diskSizeStr = fmt.Sprintf("%s GB", sizeGB)
+		}
+
+		data = append(data, []string{name, diskItem.UUID, diskSizeStr, diskItem.DeviceProperties.DeviceType})
 	}
 
-	n.tr.SetHeader([]string{"VM", "Disk UUID", "Size (Bytes)", "Disk Type"})
+	n.tr.SetHeader([]string{"VM", "Disk UUID", "Size", "Disk Type"})
 
 	// n.tr.SetFooter([]string{"", "", "Total", strconv.Itoa(len(*getRes.Status.Resources.DiskList))})
 	data = append(data, []string{name, "", "TOTAL", strconv.Itoa(len(*getRes.Status.Resources.DiskList))})
@@ -148,9 +166,10 @@ func (n *NCLI) vmSetPowerState(c *cli.Context) error {
 		return errors.New("invalid UUID format")
 	}
 	powerState := strings.ToUpper(c.Args().Get(1))
-	powerOptions := []string{"ON", "OFF", "POWERCYCLE", "RESET", "PAUSE", "SUSPEND", "RESUME", "ACPI_SHUTDOWN", "ACPI_REBOOT"}
+	// powerOptions := []string{"ON", "OFF", "POWERCYCLE", "RESET", "PAUSE", "SUSPEND", "RESUME", "ACPI_SHUTDOWN", "ACPI_REBOOT"}
+	powerOptions := []string{"ON", "OFF"}
 	if !sliceContains(powerOptions, powerState) {
-		return errors.New("invalid memory state. <ON, OFF, POWERCYCLE, RESET, PAUSE, SUSPEND, RESUME, ACPI_SHUTDOWN, ACPI_REBOOT>")
+		return errors.New("invalid memory state. <ON, OFF>")
 	}
 
 	getRequest := &pc.VMGetRequest{UUID: c.Args().First()}
