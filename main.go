@@ -16,10 +16,18 @@ type NCLI struct {
 	tr  *tablewriter.Table
 }
 
+// BCLI (base CLI) is used for non-API calls but allows the table writer setup
+type BCLI struct {
+	tr *tablewriter.Table
+}
+
 func main() {
 
 	ncli := &NCLI{}
 	ncli.tr = tablewriter.NewWriter(os.Stdout)
+
+	bcli := &BCLI{}
+	bcli.tr = tablewriter.NewWriter(os.Stdout)
 
 	flags := getFlags()
 
@@ -34,31 +42,26 @@ func main() {
 				Name:    "configure",
 				Aliases: []string{"conf"},
 				Usage:   "configure stored credentials",
-				Action:  saveCredentials,
+				Action:  bcli.configureDefaultProfile,
 			},
 			{
-				Before: func(c *cli.Context) error {
-					var err error
-					ncli.con, err = setupConnection(c)
-					return err
-				},
 				Name:  "profile",
 				Usage: "stored profile specific commands. use `uwncli profile help` to view options",
 				Subcommands: []*cli.Command{
 					{
 						Name:   "list",
 						Usage:  "list all stored profiles",
-						Action: ncli.listProfiles,
+						Action: bcli.listProfiles,
 					},
 					{
 						Name:   "delete",
 						Usage:  "uwncli delete <profile name>",
-						Action: ncli.deleteProfile,
+						Action: bcli.deleteProfile,
 					},
 					{
 						Name:   "create",
 						Usage:  "create a new profile",
-						Action: saveCredentials,
+						Action: bcli.createProfile,
 					},
 				},
 			},

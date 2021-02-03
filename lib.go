@@ -4,12 +4,15 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"math"
 	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"syscall"
 
 	"github.com/mitchellh/go-homedir"
 	nutanix "github.com/routebyintuition/ntnx-go-sdk"
@@ -17,27 +20,21 @@ import (
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
 	"golang.org/x/crypto/ssh/terminal"
+	"gopkg.in/yaml.v2"
 )
 
-// ArgList is a list of values passed in used to determine if they are nil and have a min and max length
-type ArgList struct {
-	Name      string
-	Value     interface{}
-	MinLength int
-	MaxLength int
+// InputReader provides a reader for secure input and will provide non-secure
+type InputReader interface {
+	ReadInputSecure() (string, error)
 }
 
-func evalStringPtrSlice(list []ArgList) error {
+// StdInputSecureReader provides a data type for mocking in test the secure input reader
+type StdInputSecureReader struct{}
 
-	return nil
-}
-
-func isStringPtrNotNil(str *string) (bool, int) {
-	if str == nil {
-		return false, 0
-	}
-
-	return true, len(*str)
+// ReadInputSecure will read in standard input without echo for use with passwords
+func (ir StdInputSecureReader) ReadInputSecure() (string, error) {
+	pwd, error := terminal.ReadPassword(int(syscall.Stdin))
+	return string(pwd), error
 }
 
 // setupConnection will setup the new prism central SDK connection
@@ -77,10 +74,10 @@ func IsValidUUID(uuid string) bool {
 }
 
 // GetInputStringValue provides a command prompt to retrieve the user input and allows for default values upon user entry
-func GetInputStringValue(message string, minLen int, def string) (string, error) {
+func GetInputStringValue(ir InputReader, message string, minLen int, def string) (string, error) {
 	fmt.Print(message)
 
-	inputByte, err := terminal.ReadPassword(0)
+	inputString, err := ir.ReadInputSecure()
 	if err != nil {
 		fmt.Println("error: ", err)
 		return def, errors.New("could not read terminal input")
@@ -88,7 +85,6 @@ func GetInputStringValue(message string, minLen int, def string) (string, error)
 
 	fmt.Println()
 
-	inputString := string(inputByte)
 	input := strings.TrimSpace(inputString)
 
 	if len(input) < minLen {
@@ -149,4 +145,25 @@ func NewYamlSourceFromProfileFunc(flagProfileName string) func(context *cli.Cont
 
 		return defaultInputSource()
 	}
+}
+
+// writeProfileFile writes a profile to the identified file destination
+func writeProfileFile(fl string, dl string, pi *profileItem) error {
+	yamlData, err := yaml.Marshal(&pi)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+
+	if _, err := os.Stat(dl); os.IsNotExist(err) {
+		err := os.Mkdir(dl, 0760)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = ioutil.WriteFile(fl, yamlData, 0600)
+	if err != nil {
+		return err
+	}
+	return nil
 }

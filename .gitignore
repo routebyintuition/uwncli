@@ -1,0 +1,15 @@
+### Code ###
+# Visual Studio Code - https://code.visualstudio.com/
+.settings/
+.vscode/
+tsconfig.json
+jsconfig.json
+
+### macOS ###
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+### Testing ###
+# Test output
+*.out
