@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/routebyintuition/uwncli)](https://goreportcard.com/badge/github.com/routebyintuition/uwncli)[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)[![Build Status](https://travis-ci.com/routebyintuition/uwncli.svg?branch=main)](https://travis-ci.com/routebyintuition/uwncli)[![codecov](https://codecov.io/gh/routebyintuition/uwncli/branch/main/graph/badge.svg?token=149HXZ5XZY)](https://codecov.io/gh/routebyintuition/uwncli)
+[![Go Report Card](https://goreportcard.com/badge/github.com/routebyintuition/uwncli)](https://goreportcard.com/badge/github.com/routebyintuition/uwncli) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Build Status](https://travis-ci.com/routebyintuition/uwncli.svg?branch=main)](https://travis-ci.com/routebyintuition/uwncli) [![codecov](https://codecov.io/gh/routebyintuition/uwncli/branch/main/graph/badge.svg?token=149HXZ5XZY)](https://codecov.io/gh/routebyintuition/uwncli)
 
 # uwncli
 Unikum und Wunderbar Nutanix CLI

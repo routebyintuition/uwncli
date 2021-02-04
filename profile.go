@@ -19,6 +19,8 @@ type profileItem struct {
 	PEURL         string
 	KarbonAddress string
 	KarbonURL     string
+	KarbonUser    string
+	KarbonPass    string
 	Username      string
 	Password      string
 }
@@ -34,7 +36,7 @@ func (b *BCLI) configureDefaultProfile(c *cli.Context) error {
 		return errors.New(errStr)
 	}
 
-	var prismCenUser, prismCenPass, prismCenAddr string
+	var prismCenUser, prismCenPass, prismCenAddr, karbonAddr, karbonUser, karbonPass string
 
 	prismCenUser, err := GetInputStringValue(ir, "prism central username [admin]: ", 0, "admin")
 	if err != nil {
@@ -45,12 +47,33 @@ func (b *BCLI) configureDefaultProfile(c *cli.Context) error {
 		return err
 	}
 	prismCenAddr, err = GetInputStringValue(ir, "prism central address [10.0.0.1:9440]: ", 6, "10.0.0.1")
+	if err != nil {
+		return err
+	}
+
+	karbonAddr, err = GetInputStringValue(ir, "nutanix karbon address [pc host address entered above by default]: ", 6, prismCenAddr)
+	if err != nil {
+		return err
+	}
+
+	karbonUser, err = GetInputStringValue(ir, "nutanix karbon username [pc username entered above by default]: ", 3, prismCenUser)
+	if err != nil {
+		return err
+	}
+
+	karbonPass, err = GetInputStringValue(ir, "nutanix karbon password [pc password entered above by default]: ", 8, prismCenPass)
+	if err != nil {
+		return err
+	}
 
 	profileItem := &profileItem{}
 
 	profileItem.PCAddress = prismCenAddr
 	profileItem.Username = prismCenUser
 	profileItem.Password = prismCenPass
+	profileItem.KarbonAddress = karbonAddr
+	profileItem.KarbonUser = karbonUser
+	profileItem.KarbonPass = karbonPass
 
 	err = writeProfileFile(fileLocale, dirLocale, profileItem)
 	if err != nil {
@@ -77,7 +100,7 @@ func (b *BCLI) createProfile(c *cli.Context) error {
 		return errors.New(errStr)
 	}
 
-	var prismCenUser, prismCenPass, prismCenAddr string
+	var prismCenUser, prismCenPass, prismCenAddr, karbonAddr, karbonUser, karbonPass string
 
 	prismCenUser, err = GetInputStringValue(ir, "prism central username [admin]: ", 0, "admin")
 	if err != nil {
@@ -88,12 +111,33 @@ func (b *BCLI) createProfile(c *cli.Context) error {
 		return err
 	}
 	prismCenAddr, err = GetInputStringValue(ir, "prism central address [10.0.0.1:9440]: ", 6, "10.0.0.1")
+	if err != nil {
+		return err
+	}
+
+	karbonAddr, err = GetInputStringValue(ir, "nutanix karbon address [pc host address entered above by default]: ", 6, prismCenAddr)
+	if err != nil {
+		return err
+	}
+
+	karbonUser, err = GetInputStringValue(ir, "nutanix karbon username [pc username entered above by default]: ", 3, prismCenUser)
+	if err != nil {
+		return err
+	}
+
+	karbonPass, err = GetInputStringValue(ir, "nutanix karbon password [pc password entered above by default]: ", 8, prismCenPass)
+	if err != nil {
+		return err
+	}
 
 	profileItem := &profileItem{}
 
 	profileItem.PCAddress = prismCenAddr
 	profileItem.Username = prismCenUser
 	profileItem.Password = prismCenPass
+	profileItem.KarbonAddress = karbonAddr
+	profileItem.KarbonUser = karbonUser
+	profileItem.KarbonPass = karbonPass
 
 	err = writeProfileFile(fileLocale, dirLocale, profileItem)
 	if err != nil {

@@ -33,7 +33,7 @@ func main() {
 
 	app := &cli.App{
 		Name:                 "Unikum und Wunderbar Nutanix CLI",
-		Usage:                "Built for the Unikum und Wunderbar",
+		Usage:                "uwncli [flags] [command] [subcommand]",
 		EnableBashCompletion: true,
 		Before:               altsrc.InitInputSourceWithContext(flags, NewYamlSourceFromProfileFunc("profile")),
 		Flags:                flags,
@@ -142,6 +142,28 @@ func main() {
 						Name:     "all",
 						Usage:    "retrieve all VMs",
 						Category: "cluster",
+					},
+				},
+			},
+			{
+				Before: func(c *cli.Context) error {
+					var err error
+					ncli.con, err = setupConnection(c)
+					return err
+				},
+				Name:  "karbon",
+				Usage: "karbon specific commands. use `uwncli karbon help` to view options",
+				Subcommands: []*cli.Command{
+					{
+						Name:  "cluster",
+						Usage: "karbon cluster commands. use `uwncli karbon cluster help",
+						Subcommands: []*cli.Command{
+							{
+								Name:   "list",
+								Usage:  "list all karbon clusters",
+								Action: ncli.krbnListClusters,
+							},
+						},
 					},
 				},
 			},

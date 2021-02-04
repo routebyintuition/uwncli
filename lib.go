@@ -16,6 +16,7 @@ import (
 
 	"github.com/mitchellh/go-homedir"
 	nutanix "github.com/routebyintuition/ntnx-go-sdk"
+	"github.com/routebyintuition/ntnx-go-sdk/karbon"
 	"github.com/routebyintuition/ntnx-go-sdk/pc"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
@@ -52,13 +53,24 @@ func setupConnection(c *cli.Context) (*nutanix.Client, error) {
 		pcURL = fmt.Sprintf("https://%s/api/nutanix/v3/", c.String("pcaddress"))
 	}
 
+	karbonURL := c.String("karbonurl")
+	if karbonURL == "" {
+		karbonURL = fmt.Sprintf("https://%s/karbon/", c.String("karbonaddress"))
+	}
+
 	pcConfig := &pc.ServiceConfig{
 		User: nutanix.String(c.String("username")),
 		Pass: nutanix.String(c.String("password")),
 		URL:  nutanix.String(pcURL),
 	}
 
-	con, err := nutanix.NewClient(httpClient, &nutanix.Config{PrismCentral: pcConfig})
+	krbnConfig := &karbon.ServiceConfig{
+		User: nutanix.String(c.String("karbonuser")),
+		Pass: nutanix.String(c.String("karbonpass")),
+		URL:  nutanix.String(karbonURL),
+	}
+
+	con, err := nutanix.NewClient(httpClient, &nutanix.Config{PrismCentral: pcConfig, Karbon: krbnConfig})
 	if err != nil {
 		fmt.Println("error on NewClient: ", err)
 		return nil, err

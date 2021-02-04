@@ -35,6 +35,27 @@ func getFlags() []cli.Flag {
 			DefaultText: "<password>",
 			EnvVars:     []string{"NUTANIX_PC_PASS"},
 		}),
+		altsrc.NewStringFlag(&cli.StringFlag{
+			Name:        "karbonaddress",
+			Aliases:     []string{"ka", "kaddr", "kaddress"},
+			Usage:       "Karbon Address <IP or hostname with port>",
+			DefaultText: "<karbon address>",
+			EnvVars:     []string{"NUTANIX_KARBON_ADDRESS"},
+		}),
+		altsrc.NewStringFlag(&cli.StringFlag{
+			Name:        "karbonuser",
+			Aliases:     []string{"ku", "kuser"},
+			Usage:       "Karbon Username",
+			DefaultText: "<karbon username>",
+			EnvVars:     []string{"NUTANIX_KARBON_USER"},
+		}),
+		altsrc.NewStringFlag(&cli.StringFlag{
+			Name:        "karbonpass",
+			Aliases:     []string{"kp", "kpass"},
+			Usage:       "Karbon Passowrd",
+			DefaultText: "<karbon password>",
+			EnvVars:     []string{"NUTANIX_KARBON_PASS"},
+		}),
 		&cli.StringFlag{
 			Name:        "profile",
 			Aliases:     []string{"pro"},
