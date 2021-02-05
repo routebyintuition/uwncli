@@ -28,6 +28,7 @@ type profileItem struct {
 func (b *BCLI) configureDefaultProfile(c *cli.Context) error {
 
 	ir := &StdInputSecureReader{}
+	sr := &StdInputReader{}
 
 	dirLocale, fileLocale := GetConfigLocale("default")
 
@@ -38,25 +39,25 @@ func (b *BCLI) configureDefaultProfile(c *cli.Context) error {
 
 	var prismCenUser, prismCenPass, prismCenAddr, karbonAddr, karbonUser, karbonPass string
 
-	prismCenUser, err := GetInputStringValue(ir, "prism central username [admin]: ", 0, "admin")
+	prismCenUser, err := GetInputStringValue(sr, "prism central username (ex: admin): ", 3, "")
 	if err != nil {
 		return err
 	}
-	prismCenPass, err = GetInputStringValue(ir, "prism central password []: ", 8, "")
+	prismCenPass, err = GetInputStringValue(ir, "prism central password: ", 8, "")
 	if err != nil {
 		return err
 	}
-	prismCenAddr, err = GetInputStringValue(ir, "prism central address [10.0.0.1:9440]: ", 6, "10.0.0.1")
-	if err != nil {
-		return err
-	}
-
-	karbonAddr, err = GetInputStringValue(ir, "nutanix karbon address [pc host address entered above by default]: ", 6, prismCenAddr)
+	prismCenAddr, err = GetInputStringValue(sr, "prism central address (ex: 10.0.0.1:9440): ", 6, "")
 	if err != nil {
 		return err
 	}
 
-	karbonUser, err = GetInputStringValue(ir, "nutanix karbon username [pc username entered above by default]: ", 3, prismCenUser)
+	karbonAddr, err = GetInputStringValue(sr, fmt.Sprintf("nutanix karbon address [%s]: ", prismCenAddr), 6, prismCenAddr)
+	if err != nil {
+		return err
+	}
+
+	karbonUser, err = GetInputStringValue(sr, fmt.Sprintf("nutanix karbon username [%s]: ", prismCenUser), 3, prismCenUser)
 	if err != nil {
 		return err
 	}
@@ -87,8 +88,9 @@ func (b *BCLI) configureDefaultProfile(c *cli.Context) error {
 
 func (b *BCLI) createProfile(c *cli.Context) error {
 	ir := &StdInputSecureReader{}
+	sr := &StdInputReader{}
 
-	profileName, err := GetInputStringValue(ir, "Profile name [default]: ", 0, "default")
+	profileName, err := GetInputStringValue(sr, "Profile name [default]: ", 0, "default")
 	if err != nil {
 		return err
 	}
@@ -102,25 +104,25 @@ func (b *BCLI) createProfile(c *cli.Context) error {
 
 	var prismCenUser, prismCenPass, prismCenAddr, karbonAddr, karbonUser, karbonPass string
 
-	prismCenUser, err = GetInputStringValue(ir, "prism central username [admin]: ", 0, "admin")
+	prismCenUser, err = GetInputStringValue(sr, "prism central username (ex: admin): ", 3, "")
 	if err != nil {
 		return err
 	}
-	prismCenPass, err = GetInputStringValue(ir, "prism central password []: ", 8, "")
+	prismCenPass, err = GetInputStringValue(ir, "prism central password: ", 8, "")
 	if err != nil {
 		return err
 	}
-	prismCenAddr, err = GetInputStringValue(ir, "prism central address [10.0.0.1:9440]: ", 6, "10.0.0.1")
-	if err != nil {
-		return err
-	}
-
-	karbonAddr, err = GetInputStringValue(ir, "nutanix karbon address [pc host address entered above by default]: ", 6, prismCenAddr)
+	prismCenAddr, err = GetInputStringValue(sr, "prism central address (ex: 10.0.0.1:9440): ", 6, "")
 	if err != nil {
 		return err
 	}
 
-	karbonUser, err = GetInputStringValue(ir, "nutanix karbon username [pc username entered above by default]: ", 3, prismCenUser)
+	karbonAddr, err = GetInputStringValue(sr, fmt.Sprintf("nutanix karbon address [%s]: ", prismCenAddr), 6, prismCenAddr)
+	if err != nil {
+		return err
+	}
+
+	karbonUser, err = GetInputStringValue(sr, fmt.Sprintf("nutanix karbon username [%s]: ", prismCenUser), 3, prismCenUser)
 	if err != nil {
 		return err
 	}

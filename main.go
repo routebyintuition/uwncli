@@ -151,6 +151,22 @@ func main() {
 					ncli.con, err = setupConnection(c)
 					return err
 				},
+				Name:  "subnet",
+				Usage: "subnet specific commands. use `uwncli subnet help` to view options",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "list",
+						Usage:  "list all subnets",
+						Action: ncli.listSubnets,
+					},
+				},
+			},
+			{
+				Before: func(c *cli.Context) error {
+					var err error
+					ncli.con, err = setupConnection(c)
+					return err
+				},
 				Name:  "karbon",
 				Usage: "karbon specific commands. use `uwncli karbon help` to view options",
 				Subcommands: []*cli.Command{

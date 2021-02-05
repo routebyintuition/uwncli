@@ -26,16 +26,28 @@ import (
 
 // InputReader provides a reader for secure input and will provide non-secure
 type InputReader interface {
-	ReadInputSecure() (string, error)
+	ReadInput() (string, error)
 }
 
 // StdInputSecureReader provides a data type for mocking in test the secure input reader
 type StdInputSecureReader struct{}
 
-// ReadInputSecure will read in standard input without echo for use with passwords
-func (ir StdInputSecureReader) ReadInputSecure() (string, error) {
+// StdInputReader data type for mocking that should not be used for passwords
+type StdInputReader struct{}
+
+// ReadInput will read in standard input without echo for use with passwords
+func (ir StdInputSecureReader) ReadInput() (string, error) {
 	pwd, error := terminal.ReadPassword(int(syscall.Stdin))
+	fmt.Println()
 	return string(pwd), error
+}
+
+// ReadInput will read in standard input but should not be used for passwords
+func (ir StdInputReader) ReadInput() (string, error) {
+	var input string
+	fmt.Scanln(&input)
+
+	return input, nil
 }
 
 // setupConnection will setup the new prism central SDK connection
@@ -89,17 +101,15 @@ func IsValidUUID(uuid string) bool {
 func GetInputStringValue(ir InputReader, message string, minLen int, def string) (string, error) {
 	fmt.Print(message)
 
-	inputString, err := ir.ReadInputSecure()
+	inputString, err := ir.ReadInput()
 	if err != nil {
 		fmt.Println("error: ", err)
 		return def, errors.New("could not read terminal input")
 	}
 
-	fmt.Println()
-
 	input := strings.TrimSpace(inputString)
 
-	if len(input) < minLen {
+	if len(input) < minLen && len(def) < minLen {
 		fmt.Printf("invalid input length. less than %d characters \n", minLen)
 		return def, errors.New("invalid input length")
 	}

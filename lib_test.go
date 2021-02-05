@@ -8,7 +8,7 @@ type stubInputReader struct {
 	Input string
 }
 
-func (ir stubInputReader) ReadInputSecure() (string, error) {
+func (ir stubInputReader) ReadInput() (string, error) {
 	return ir.Input, nil
 }
 
