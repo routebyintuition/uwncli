@@ -82,6 +82,8 @@ Skipping certificate verification can be useful for non-production environments 
 - image
   - list
   - create
+- subnet
+  - list
 - karbon
   - cluster
     - list
