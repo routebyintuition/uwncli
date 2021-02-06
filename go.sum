@@ -21,6 +21,12 @@ github.com/routebyintuition/ntnx-go-sdk v0.0.0-20210126000234-5af8810be5e7 h1:gl
 github.com/routebyintuition/ntnx-go-sdk v0.0.0-20210126000234-5af8810be5e7/go.mod h1:t0ryHV99vhsbjUrOgp93bD49XjmJIMPX4QM/hlixZbg=
 github.com/routebyintuition/ntnx-go-sdk v0.0.0-20210126182848-3c33318d8985 h1:DLEQ7ESop2kWMhXHp4UDtyNA/vGlEbys9F82YIt5YpE=
 github.com/routebyintuition/ntnx-go-sdk v0.0.0-20210126182848-3c33318d8985/go.mod h1:t0ryHV99vhsbjUrOgp93bD49XjmJIMPX4QM/hlixZbg=
+github.com/routebyintuition/ntnx-go-sdk v0.0.0-20210205211218-d6a7da7def1e h1:dYO1SXQxG0BrbBRh1TGPYehumyN8PcVWIHkVFCEI5vY=
+github.com/routebyintuition/ntnx-go-sdk v0.0.0-20210205211218-d6a7da7def1e/go.mod h1:t0ryHV99vhsbjUrOgp93bD49XjmJIMPX4QM/hlixZbg=
+github.com/routebyintuition/ntnx-go-sdk v0.0.0-20210206000055-74a39a688ec1 h1:L9WSHNpjG81IOth5QA0aPQJwhKJ73EW4pN4sKdbdEWU=
+github.com/routebyintuition/ntnx-go-sdk v0.0.0-20210206000055-74a39a688ec1/go.mod h1:t0ryHV99vhsbjUrOgp93bD49XjmJIMPX4QM/hlixZbg=
+github.com/routebyintuition/ntnx-go-sdk v0.0.0-20210206001845-ae0f0ca17f5c h1:R8tKuAorhvAfAqTmJFEXW5bdrFJUI64Bj/OMxsxqFIU=
+github.com/routebyintuition/ntnx-go-sdk v0.0.0-20210206001845-ae0f0ca17f5c/go.mod h1:t0ryHV99vhsbjUrOgp93bD49XjmJIMPX4QM/hlixZbg=
 github.com/russross/blackfriday/v2 v2.0.1 h1:lPqVAte+HuHNfhJ/0LC98ESWRz8afy9tM/0RK8m9o+Q=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/shurcooL/sanitized_anchor_name v1.0.0 h1:PdmoCO6wvbs+7yrJyMORt4/BmY5IYyJwS/kOiWx8mHo=

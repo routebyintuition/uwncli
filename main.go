@@ -135,6 +135,27 @@ func main() {
 					ncli.con, err = setupConnection(c)
 					return err
 				},
+				Name:  "disk",
+				Usage: "disk specific commands. use `uwncli disk help` to view options",
+				Subcommands: []*cli.Command{
+					{
+						Name:     "list",
+						Usage:    "list all disks",
+						Action:   ncli.diskList,
+					},
+					{
+						Name:     "list-vdisk",
+						Usage:    "list all vDisks",
+						Action:   ncli.vDiskList,
+					},
+				},
+			},			
+			{
+				Before: func(c *cli.Context) error {
+					var err error
+					ncli.con, err = setupConnection(c)
+					return err
+				},
 				Name:  "cluster",
 				Usage: "cluster specific commands. use `uwncli cluster help` to view options",
 				Subcommands: []*cli.Command{

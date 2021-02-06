@@ -22,6 +22,20 @@ func getFlags() []cli.Flag {
 			EnvVars:     []string{"NUTANIX_PC_ADDRESS"},
 		}),
 		altsrc.NewStringFlag(&cli.StringFlag{
+			Name:        "peurl",
+			Aliases:     []string{"element_url"},
+			Usage:       "Prism Element URL",
+			DefaultText: "https://10.0.0.11:9440/PrismGateway/services/rest/v2.0/",
+			EnvVars:     []string{"NUTANIX_PE_URL"},
+		}),
+		altsrc.NewStringFlag(&cli.StringFlag{
+			Name:        "peaddress",
+			Aliases:     []string{"element_address"},
+			Usage:       "Prism Element Address (any CVM IP/hostname)",
+			DefaultText: "10.0.0.11:9440",
+			EnvVars:     []string{"NUTANIX_PE_ADDRESS"},
+		}),
+		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "username",
 			Aliases:     []string{"u", "user"},
 			Usage:       "Prism Central Username",

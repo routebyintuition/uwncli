@@ -136,3 +136,29 @@ func TestGetInputStringValue(t *testing.T) {
 		})
 	}
 }
+
+func TestBytesToHumanReadable(t *testing.T) {
+	type args struct {
+		size int64
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "GB test",
+			args: args{
+				size: 21474836480,
+			},
+			want: "21.5 GB",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := BytesToHumanReadable(tt.args.size); got != tt.want {
+				t.Errorf("BytesToHumanReadable() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

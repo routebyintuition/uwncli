@@ -37,7 +37,7 @@ func (b *BCLI) configureDefaultProfile(c *cli.Context) error {
 		return errors.New(errStr)
 	}
 
-	var prismCenUser, prismCenPass, prismCenAddr, karbonAddr, karbonUser, karbonPass string
+	var prismCenUser, prismEleAddr, prismCenPass, prismCenAddr, karbonAddr, karbonUser, karbonPass string
 
 	prismCenUser, err := GetInputStringValue(sr, "prism central username (ex: admin): ", 3, "")
 	if err != nil {
@@ -48,6 +48,11 @@ func (b *BCLI) configureDefaultProfile(c *cli.Context) error {
 		return err
 	}
 	prismCenAddr, err = GetInputStringValue(sr, "prism central address (ex: 10.0.0.1:9440): ", 6, "")
+	if err != nil {
+		return err
+	}
+
+	prismEleAddr, err = GetInputStringValue(sr, "prism element CVM address (any) (ex: 10.0.0.11:9440): ", 6, "")
 	if err != nil {
 		return err
 	}
@@ -70,6 +75,7 @@ func (b *BCLI) configureDefaultProfile(c *cli.Context) error {
 	profileItem := &profileItem{}
 
 	profileItem.PCAddress = prismCenAddr
+	profileItem.PEAddress = prismEleAddr
 	profileItem.Username = prismCenUser
 	profileItem.Password = prismCenPass
 	profileItem.KarbonAddress = karbonAddr
@@ -102,7 +108,7 @@ func (b *BCLI) createProfile(c *cli.Context) error {
 		return errors.New(errStr)
 	}
 
-	var prismCenUser, prismCenPass, prismCenAddr, karbonAddr, karbonUser, karbonPass string
+	var prismCenUser, prismCenPass, prismCenAddr, prismEleAddr, karbonAddr, karbonUser, karbonPass string
 
 	prismCenUser, err = GetInputStringValue(sr, "prism central username (ex: admin): ", 3, "")
 	if err != nil {
@@ -113,6 +119,11 @@ func (b *BCLI) createProfile(c *cli.Context) error {
 		return err
 	}
 	prismCenAddr, err = GetInputStringValue(sr, "prism central address (ex: 10.0.0.1:9440): ", 6, "")
+	if err != nil {
+		return err
+	}
+
+	prismEleAddr, err = GetInputStringValue(sr, "prism element CVM address (any) (ex: 10.0.0.11:9440): ", 6, "")
 	if err != nil {
 		return err
 	}
@@ -135,6 +146,7 @@ func (b *BCLI) createProfile(c *cli.Context) error {
 	profileItem := &profileItem{}
 
 	profileItem.PCAddress = prismCenAddr
+	profileItem.PEAddress = prismEleAddr
 	profileItem.Username = prismCenUser
 	profileItem.Password = prismCenPass
 	profileItem.KarbonAddress = karbonAddr

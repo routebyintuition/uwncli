@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"syscall"
 
@@ -18,6 +19,7 @@ import (
 	nutanix "github.com/routebyintuition/ntnx-go-sdk"
 	"github.com/routebyintuition/ntnx-go-sdk/karbon"
 	"github.com/routebyintuition/ntnx-go-sdk/pc"
+	"github.com/routebyintuition/ntnx-go-sdk/pe"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
 	"golang.org/x/crypto/ssh/terminal"
@@ -65,6 +67,11 @@ func setupConnection(c *cli.Context) (*nutanix.Client, error) {
 		pcURL = fmt.Sprintf("https://%s/api/nutanix/v3/", c.String("pcaddress"))
 	}
 
+	peURL := c.String("peurl")
+	if peURL == "" {
+		peURL = fmt.Sprintf("https://%s/PrismGateway/services/rest/v2.0/", c.String("peaddress"))
+	}
+
 	karbonURL := c.String("karbonurl")
 	if karbonURL == "" {
 		karbonURL = fmt.Sprintf("https://%s/karbon/", c.String("karbonaddress"))
@@ -76,13 +83,23 @@ func setupConnection(c *cli.Context) (*nutanix.Client, error) {
 		URL:  nutanix.String(pcURL),
 	}
 
+	peConfig := &pe.ServiceConfig{
+		User: nutanix.String(c.String("username")),
+		Pass: nutanix.String(c.String("password")),
+		URL:  nutanix.String(peURL),
+	}
+
 	krbnConfig := &karbon.ServiceConfig{
 		User: nutanix.String(c.String("karbonuser")),
 		Pass: nutanix.String(c.String("karbonpass")),
 		URL:  nutanix.String(karbonURL),
 	}
 
-	con, err := nutanix.NewClient(httpClient, &nutanix.Config{PrismCentral: pcConfig, Karbon: krbnConfig})
+	con, err := nutanix.NewClient(httpClient, &nutanix.Config{
+		PrismCentral: pcConfig,
+		Karbon:       krbnConfig,
+		PrismElement: peConfig,
+	})
 	if err != nil {
 		fmt.Println("error on NewClient: ", err)
 		return nil, err
@@ -188,4 +205,34 @@ func writeProfileFile(fl string, dl string, pi *profileItem) error {
 		return err
 	}
 	return nil
+}
+
+// BytesToHumanReadable converts byte sizes to human readable
+func BytesToHumanReadable(size int64) string {
+	sizeInt := float64(size)
+
+	sizeKB := fmt.Sprintf("%.1f", float64(sizeInt/1000))
+	sizeMB := fmt.Sprintf("%.1f", float64(sizeInt/1000000))
+	sizeGB := fmt.Sprintf("%.1f", float64(sizeInt/1000000000))
+	sizeTB := fmt.Sprintf("%.1f", float64(sizeInt/1000000000000))
+
+	diskSizeStr := strconv.Itoa(int(size)) + " Bytes"
+
+	if sizeKB != "0.0" {
+		diskSizeStr = fmt.Sprintf("%s KB", sizeKB)
+	}
+
+	if sizeMB != "0.0" {
+		diskSizeStr = fmt.Sprintf("%s KB", sizeMB)
+	}
+
+	if sizeGB != "0.0" {
+		diskSizeStr = fmt.Sprintf("%s GB", sizeGB)
+	}
+
+	if sizeTB != "0.0" {
+		diskSizeStr = fmt.Sprintf("%s TB", sizeTB)
+	}
+
+	return diskSizeStr
 }
