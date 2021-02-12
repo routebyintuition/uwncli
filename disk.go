@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 	"strconv"
 
 	"github.com/routebyintuition/ntnx-go-sdk/pe"
@@ -23,8 +23,6 @@ func (n *NCLI) diskList(c *cli.Context) error {
 
 	data := [][]string{}
 
-	fmt.Println("entities: ", len(getRes.Entities))
-
 	for _, entityValue := range getRes.Entities {
 		data = append(data, []string{*entityValue.DiskUUID, *entityValue.StorageTierName, strconv.Itoa(int(*entityValue.DiskSize)), *entityValue.DiskStatus, *entityValue.HostName, strconv.FormatBool(*entityValue.Online)})
 	}
@@ -34,6 +32,7 @@ func (n *NCLI) diskList(c *cli.Context) error {
 	return nil
 }
 
+// vDiskList lists all vdisks with details
 func (n *NCLI) vDiskList(c *cli.Context) error {
 	ListRequest := new(pe.DiskVirtualListRequest)
 
@@ -47,8 +46,6 @@ func (n *NCLI) vDiskList(c *cli.Context) error {
 	n.tr.SetFooter([]string{"", "", "", "TOTAL", strconv.Itoa(*getRes.Metadata.TotalEntities)})
 
 	data := [][]string{}
-
-	fmt.Println("entities: ", len(getRes.Entities))
 
 	for _, entityValue := range getRes.Entities {
 		attachedVM := "None"
@@ -66,4 +63,20 @@ func (n *NCLI) vDiskList(c *cli.Context) error {
 	n.tr.Render()
 
 	return nil
+}
+
+// vDiskGetByUUID returns vdisk details based upon vdisk UUID
+func (n *NCLI) vDiskGetByUUID(uuid string) (*pe.DiskVirtualGetResponse, error) {
+	if !IsValidUUID(uuid) {
+		return nil, errors.New("invalid UUID format on vdisk get")
+	}
+
+	ListRequest := &pe.DiskVirtualGetRequest{Query: &pe.DiskVirtualGetRequestQuery{UUID: uuid}}
+
+	getRes, _, err := n.con.PE.Disk.GetVDisk(ListRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	return getRes, nil
 }

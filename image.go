@@ -112,3 +112,45 @@ func (n *NCLI) imageCreate(c *cli.Context) error {
 
 	return nil
 }
+
+// GetImageUUIDList returns a string slice containing all image UUIDs
+func (n *NCLI) GetImageUUIDList() ([]string, error) {
+
+	ListRequest := new(pc.ImageListRequest)
+	ListRequest.Length = 40
+
+	data := []string{}
+
+	var listLoop []pc.Entities
+	totalMatches := 0
+	offset := 0
+	currentMatches := -1
+	var err error
+	getRes := &pc.ImageListResponse{}
+
+	for totalMatches > currentMatches {
+		if currentMatches == -1 {
+			currentMatches = 0
+		}
+
+		ListRequest.Offset = offset
+
+		getRes, _, err = n.con.PC.Image.List(ListRequest)
+		if err != nil {
+			return nil, err
+		}
+
+		currentMatches += *getRes.Metadata.Length
+		totalMatches = *getRes.Metadata.TotalMatches
+		offset += ListRequest.Length
+		listLoop = append(listLoop, getRes.Entities...)
+	}
+
+	for _, entityValue := range listLoop {
+		if entityValue.Metadata.UUID != nil {
+			data = append(data, fmt.Sprintf(*entityValue.Metadata.UUID))
+		}
+	}
+
+	return data, nil
+}

@@ -73,6 +73,13 @@ func main() {
 				},
 				Name:  "vm",
 				Usage: "virtual machine specific commands. use `uwncli vm help` to view options",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "vm-yaml",
+						Usage:       "<vm yaml config file>",
+						DefaultText: "empty",
+					},
+				},
 				Subcommands: []*cli.Command{
 					{
 						Name:     "list",
@@ -87,9 +94,21 @@ func main() {
 						Category: "get",
 					},
 					{
-						Name:     "disklist",
+						Name:     "get-vdisks",
+						Usage:    "<VM UUID>",
+						Action:   ncli.vmVDiskGet,
+						Category: "get",
+					},
+					{
+						Name:     "get-disks",
 						Usage:    "<VM UUID>",
 						Action:   ncli.vmDiskList,
+						Category: "get",
+					},
+					{
+						Name:     "create",
+						Usage:    "[--vm-yaml <vm yaml config file>] [yaml config from standard input (pipe)]",
+						Action:   ncli.vmCreate,
 						Category: "put",
 					},
 					{
@@ -139,17 +158,17 @@ func main() {
 				Usage: "disk specific commands. use `uwncli disk help` to view options",
 				Subcommands: []*cli.Command{
 					{
-						Name:     "list",
-						Usage:    "list all disks",
-						Action:   ncli.diskList,
+						Name:   "list",
+						Usage:  "list all disks",
+						Action: ncli.diskList,
 					},
 					{
-						Name:     "list-vdisk",
-						Usage:    "list all vDisks",
-						Action:   ncli.vDiskList,
+						Name:   "list-vdisk",
+						Usage:  "list all vDisks",
+						Action: ncli.vDiskList,
 					},
 				},
-			},			
+			},
 			{
 				Before: func(c *cli.Context) error {
 					var err error
@@ -160,9 +179,16 @@ func main() {
 				Usage: "cluster specific commands. use `uwncli cluster help` to view options",
 				Subcommands: []*cli.Command{
 					{
-						Name:     "all",
-						Usage:    "retrieve all VMs",
+						Name:     "list",
+						Usage:    "retrieve list of clusters registered with Prism Central",
 						Category: "cluster",
+						Action:   ncli.clusterList,
+					},
+					{
+						Name:     "get",
+						Usage:    "<cluster UUID>",
+						Category: "cluster",
+						Action:   ncli.clusterGet,
 					},
 				},
 			},

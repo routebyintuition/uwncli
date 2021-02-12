@@ -77,6 +77,9 @@ Skipping certificate verification can be useful for non-production environments 
   - disklist
   - update-memory
   - update-power
+- disk
+  - list
+  - list-vdisk
 - cluster
   - list
 - image

@@ -1,0 +1,38 @@
+---
+spec:
+  name: linux-test-vm
+  resources:
+    nic_list:
+    - nic_type: NORMAL_NIC
+      network_function_nic_type: INGRESS
+      subnet_reference:
+        kind: subnet
+        uuid: "{{SUBNET_UUID}}"
+    boot_config:
+      boot_device:
+        disk_address:
+          device_index: 0
+          adapter_type: SCSI
+    num_vcpus_per_socket: 1
+    num_sockets: 1
+    memory_size_mib: 1024
+    power_state: 'ON'
+    guest_customization:
+      cloud_init:
+        meta_data: ''
+        user_data: I2Nsb3VkLWNvbmZpZwpob3N0bmFtZTogY2VudG9zLWV4CmZxZG46IGNlbnRvc2xhYi5kb21haW4ubG9jYWwKbWFuYWdlX2V0Y19ob3N0czogdHJ1ZQpwYWNrYWdlX3VwZ3JhZGU6IHRydWUKdXNlcnM6CiAgLSBuYW1lOiBjZW50b3MKICAgIGdyb3Vwczogd2hlZWwKICAgIGxvY2tfcGFzc3dkOiBmYWxzZQogICAgcGFzc3dkOiBsaW51eC1wYXNzd29yZC1mcm9tLWV0Yy1zaGFkb3cKICAgIHNoZWxsOiAvYmluL2Jhc2gKICAgIHN1ZG86IFsnQUxMPShBTEwpIE5PUEFTU1dEOkFMTCddCiAgICBzc2gtYXV0aG9yaXplZC1rZXlzOgogICAgICAtIHNzaC1yc2EgcnNha2V5LWdldC1mcm9tLXlvdXItY29uZmlndXJhdGlvbiAKCg==
+      is_overridable: false
+    disk_list:
+    - data_source_reference:
+        kind: image
+        uuid: "{{IMAGE_UUID}}"
+      device_properties:
+        disk_address:
+          device_index: 0
+          adapter_type: SCSI
+        device_type: DISK
+api_version: '3.0'
+metadata:
+  kind: vm
+  categories:
+    Project: default

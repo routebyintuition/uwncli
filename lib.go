@@ -2,8 +2,10 @@ package main
 
 import (
 	"crypto/tls"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"math"
@@ -101,7 +103,6 @@ func setupConnection(c *cli.Context) (*nutanix.Client, error) {
 		PrismElement: peConfig,
 	})
 	if err != nil {
-		fmt.Println("error on NewClient: ", err)
 		return nil, err
 	}
 
@@ -120,14 +121,12 @@ func GetInputStringValue(ir InputReader, message string, minLen int, def string)
 
 	inputString, err := ir.ReadInput()
 	if err != nil {
-		fmt.Println("error: ", err)
 		return def, errors.New("could not read terminal input")
 	}
 
 	input := strings.TrimSpace(inputString)
 
 	if len(input) < minLen && len(def) < minLen {
-		fmt.Printf("invalid input length. less than %d characters \n", minLen)
 		return def, errors.New("invalid input length")
 	}
 
@@ -156,16 +155,6 @@ func GetMibFromMB(mb int) int {
 // defaultInputSource creates a default InputSourceContext.
 func defaultInputSource() (altsrc.InputSourceContext, error) {
 	return &altsrc.MapInputSource{}, nil
-}
-
-func sliceContains(sli []string, str string) bool {
-	for _, sliceItem := range sli {
-		if sliceItem == str {
-			return true
-		}
-	}
-
-	return false
 }
 
 // NewYamlSourceFromProfileFunc creates a new Yaml InputSourceContext from a provided flag name and source context.
@@ -235,4 +224,87 @@ func BytesToHumanReadable(size int64) string {
 	}
 
 	return diskSizeStr
+}
+
+// isInputFromPipe determines if the input is from a pipe or file
+// thanks to dev.to article
+func isInputFromPipe() bool {
+	fileInfo, _ := os.Stdin.Stat()
+	return fileInfo.Mode()&os.ModeCharDevice == 0
+}
+
+func processYAMLReader(r io.Reader, i interface{}) (interface{}, error) {
+	err := yaml.NewDecoder(r).Decode(i)
+	if err != nil {
+		return nil, err
+	}
+
+	return i, nil
+}
+
+// isDirectory checks to see if path is a directory
+func isDirectory(path string) (bool, error) {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return false, err
+	}
+	return fileInfo.IsDir(), err
+}
+
+// ValidYAMLCreate validates a create VM YAML file
+func (n *NCLI) ValidYAMLCreate(pcc *pc.VMCreateRequest) error {
+	if len(*pcc.Spec.Name) < 3 {
+		return errors.New("invalid length of VM name")
+	}
+
+	subnetExists := false
+	subnetList, err := n.getSubnetUUIDList()
+
+	if err != nil {
+		return err
+	}
+	for _, v := range *pcc.Spec.Resources.NicList {
+		if stringSliceContains(subnetList, v.SubnetReference.UUID) {
+			subnetExists = true
+		}
+	}
+	if !subnetExists {
+		return errors.New("subnet UUID not defined on cluster")
+	}
+
+	imageExists := false
+	imageList, err := n.GetImageUUIDList()
+	if err != nil {
+		return err
+	}
+	for _, v := range *pcc.Spec.Resources.DiskList {
+		if v.DataSourceReference != nil {
+			if stringSliceContains(imageList, v.DataSourceReference.UUID) {
+				imageExists = true
+			}
+		} else {
+			imageExists = true
+		}
+	}
+	if !imageExists {
+		return errors.New("disk image UUID not defined on cluster")
+	}
+
+	return errors.New("function not ready for prime time")
+}
+
+// stringSliceContains checks whether a string slice contains a specific string
+func stringSliceContains(slice []string, str string) bool {
+	for _, val := range slice {
+		if val == str {
+			return true
+		}
+	}
+	return false
+}
+
+// isBase64 determines of a string is base64 encoded...used for cloud_init
+func isBase64(s string) bool {
+	_, err := base64.StdEncoding.DecodeString(s)
+	return err == nil
 }

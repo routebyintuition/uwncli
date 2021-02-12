@@ -162,3 +162,114 @@ func TestBytesToHumanReadable(t *testing.T) {
 		})
 	}
 }
+
+func Test_isBase64(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "base64 test false",
+			args: args{
+				s: "this is a test",
+			},
+			want: false,
+		},
+		{
+			name: "base64 test true",
+			args: args{
+				s: "dGhpcyBpcyBhIHRlc3QK",
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isBase64(tt.args.s); got != tt.want {
+				t.Errorf("isBase64() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_stringSliceContains(t *testing.T) {
+	testData := []string{"one", "two", "three"}
+	type args struct {
+		slice []string
+		str   string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "slice contains true",
+			args: args{
+				slice: testData,
+				str:   "two",
+			},
+			want: true,
+		},
+		{
+			name: "slice contains false",
+			args: args{
+				slice: testData,
+				str:   "four",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := stringSliceContains(tt.args.slice, tt.args.str); got != tt.want {
+				t.Errorf("stringSliceContains() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_isDirectory(t *testing.T) {
+	type args struct {
+		path string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "tmp is a directory",
+			args: args{
+				path: "/tmp",
+			},
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name: "directory error",
+			args: args{
+				path: "/tmpasdfasdfs",
+			},
+			want:    false,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := isDirectory(tt.args.path)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("isDirectory() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("isDirectory() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

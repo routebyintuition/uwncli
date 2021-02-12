@@ -1,15 +1,67 @@
 package main
 
 import (
+	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
 	nutanix "github.com/routebyintuition/ntnx-go-sdk"
 	"github.com/routebyintuition/ntnx-go-sdk/pc"
+	"github.com/routebyintuition/ntnx-go-sdk/pe"
 	"github.com/urfave/cli/v2"
 )
+
+func (n *NCLI) vmCreate(c *cli.Context) error {
+	createInstruct := &pc.VMCreateRequest{}
+
+	if isInputFromPipe() {
+		createInstructStruct, err := processYAMLReader(os.Stdin, createInstruct)
+		if err != nil {
+			return err
+		}
+		outJSON, _ := json.MarshalIndent(createInstructStruct, "", "  ")
+		fmt.Println("YAML process results: ", string(outJSON))
+
+	} else if len(c.String("vm-yaml")) > 0 {
+		dir, err := isDirectory(c.String("vm-yaml"))
+		if err != nil {
+			return err
+		}
+		if dir {
+			return errors.New("path provided is a directory...single yaml file needed")
+		}
+		fh, err := os.Open(c.String("vm-yaml"))
+		if err != nil {
+			return err
+		}
+		fhr := bufio.NewReader(fh)
+		createInstructStruct, err := processYAMLReader(fhr, createInstruct)
+		outJSON, _ := json.MarshalIndent(createInstructStruct, "", "  ")
+		fmt.Println("YAML process results: ", string(outJSON))
+
+	} else {
+		return errors.New("no yaml config provided via stdin or file")
+	}
+
+	err := n.ValidYAMLCreate(createInstruct)
+	if err != nil {
+		return err
+	}
+
+	getRes, _, err := n.con.PC.VM.Create(createInstruct)
+	if err != nil {
+		return err
+	}
+
+	outJSON, _ := json.MarshalIndent(getRes, "", "  ")
+	fmt.Println("YAML process results: ", string(outJSON))
+
+	return nil
+}
 
 func (n *NCLI) vmList(c *cli.Context) error {
 
@@ -101,6 +153,67 @@ func (n *NCLI) vmMemoryUpdate(c *cli.Context) error {
 	return nil
 }
 
+// vmVDiskGet returns the VDISK list for an identified VM
+func (n *NCLI) vmVDiskGet(c *cli.Context) error {
+	if !IsValidUUID(c.Args().First()) {
+		return errors.New("invalid UUID format")
+	}
+
+	getRequest := &pe.VMGetRequest{
+		Params: &pe.VMGetRequestParams{
+			UUID: c.Args().First(),
+		},
+		Query: &pe.VMGetRequestQuery{
+			IncludeVMDiskConfig: true,
+		},
+	}
+	getRes, _, err := n.con.PE.VM.Get(getRequest)
+	if err != nil {
+		return err
+	}
+
+	data := [][]string{}
+
+	name := *getRes.Name
+
+	vdiskCount := 0
+	if getRes.VMDiskInfo != nil {
+		vdiskCount = len(*getRes.VMDiskInfo)
+	}
+
+	if getRes.VMDiskInfo != nil {
+		for _, diskItem := range *getRes.VMDiskInfo {
+			diskSizeStr := BytesToHumanReadable(int64(*diskItem.Size))
+
+			nfsLocation := "nfs"
+
+			if diskItem.DiskAddress.NdfsFilepath != nil {
+				nfsLocation = *diskItem.DiskAddress.NdfsFilepath
+			}
+
+			diskType := "DISK"
+			if diskItem.IsCdrom != nil {
+				if *diskItem.IsCdrom {
+					diskType = "CDROM"
+				}
+			}
+
+			data = append(data, []string{"PC", *diskItem.DiskAddress.DeviceUUID, fmt.Sprintf("nfs://127.0.0.1%s", nfsLocation), diskSizeStr, diskType})
+			data = append(data, []string{"PE", *diskItem.DiskAddress.VmdiskUUID, fmt.Sprintf("nfs://127.0.0.1%s", nfsLocation), diskSizeStr, diskType})
+		}
+	}
+
+	n.tr.SetHeader([]string{"", fmt.Sprintf("Disk UUID - %s", name), "NFS LOCATION", "Size", "Disk Type"})
+
+	data = append(data, []string{"", "", "", "TOTAL", strconv.Itoa(vdiskCount)})
+
+	n.tr.SetAutoMergeCells(true)
+	n.tr.SetRowLine(true)
+	n.tr.AppendBulk(data)
+	n.tr.Render()
+	return nil
+}
+
 func (n *NCLI) vmGet(c *cli.Context) error {
 	if !IsValidUUID(c.Args().First()) {
 		return errors.New("invalid UUID format")
@@ -168,7 +281,7 @@ func (n *NCLI) vmSetPowerState(c *cli.Context) error {
 	powerState := strings.ToUpper(c.Args().Get(1))
 	// powerOptions := []string{"ON", "OFF", "POWERCYCLE", "RESET", "PAUSE", "SUSPEND", "RESUME", "ACPI_SHUTDOWN", "ACPI_REBOOT"}
 	powerOptions := []string{"ON", "OFF"}
-	if !sliceContains(powerOptions, powerState) {
+	if !stringSliceContains(powerOptions, powerState) {
 		return errors.New("invalid memory state. <ON, OFF>")
 	}
 
@@ -206,7 +319,6 @@ func (n *NCLI) vmDiskList(c *cli.Context) error {
 
 	getRequest := &pc.VMGetRequest{UUID: c.Args().First()}
 	getRes, _, err := n.con.PC.VM.Get(getRequest)
-
 	if err != nil {
 		return err
 	}
@@ -223,8 +335,6 @@ func (n *NCLI) vmDiskList(c *cli.Context) error {
 
 	n.tr.SetFooter([]string{name, "Total", strconv.Itoa(len(*getRes.Status.Resources.DiskList))})
 
-	//n.tr.SetAutoMergeCells(true)
-	//n.tr.SetRowLine(true)
 	n.tr.AppendBulk(data)
 	n.tr.Render()
 	return nil
